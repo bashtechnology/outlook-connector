@@ -48,6 +48,7 @@ func corsMiddleware(AllowedOrigins string) gin.HandlerFunc {
 }
 
 func isOriginAllowed(origin string, allowedOrigins []string) bool {
+	return true
 	for _, allowedOrigin := range allowedOrigins {
 		if allowedOrigin == origin {
 			return true

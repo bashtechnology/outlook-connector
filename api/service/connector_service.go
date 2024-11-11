@@ -7,4 +7,5 @@ import (
 
 type ConnectorService interface {
 	GetEmailFilter(req request.GetEmailFilterRequest) response.HttpResponse
+	GetEmailFilterFull(req request.GetEmailFilterRequest) response.HttpResponse
 }

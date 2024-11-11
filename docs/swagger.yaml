@@ -43,6 +43,76 @@ definitions:
     required:
     - key
     type: object
+  response.AttachmentResponse:
+    properties:
+      base64:
+        type: string
+      content_type:
+        description: 'Tipo MIME do anexo (ex: image/png, application/pdf)'
+        type: string
+      id:
+        description: ID do anexo (caso disponível)
+        type: string
+      is_inline:
+        description: Indica se o anexo é inline
+        type: boolean
+      last_modified_date_time:
+        description: Data e hora da última modificação do anexo
+        type: string
+      name:
+        description: Nome do anexo
+        type: string
+      size:
+        description: Tamanho do anexo em bytes
+        type: integer
+    type: object
+  response.EmailResponse:
+    properties:
+      attachments:
+        items:
+          $ref: '#/definitions/response.AttachmentResponse'
+        type: array
+      bcc_recipients:
+        items:
+          $ref: '#/definitions/response.RecipientResponse'
+        type: array
+      body_content:
+        type: string
+      body_content_type:
+        type: string
+      cc_recipients:
+        items:
+          $ref: '#/definitions/response.RecipientResponse'
+        type: array
+      conversation_id:
+        type: string
+      from_email:
+        type: string
+      from_name:
+        type: string
+      has_attachments:
+        type: boolean
+      importance:
+        type: string
+      internet_message_id:
+        type: string
+      is_read:
+        type: boolean
+      received_date_time:
+        type: string
+      sender_email:
+        type: string
+      sender_name:
+        type: string
+      sent_date_time:
+        type: string
+      subject:
+        type: string
+      to_recipients:
+        items:
+          $ref: '#/definitions/response.RecipientResponse'
+        type: array
+    type: object
   response.HttpResponse:
     properties:
       code:
@@ -51,6 +121,13 @@ definitions:
       message:
         type: string
       status:
+        type: string
+    type: object
+  response.RecipientResponse:
+    properties:
+      address:
+        type: string
+      name:
         type: string
     type: object
 info:
@@ -63,6 +140,40 @@ paths:
     post:
       description: Obter os emails para os parametros informados.
       operationId: GetEmailFilter
+      parameters:
+      - description: Requisição Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.GetEmailFilterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Dados recebidos!
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.HttpResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.EmailResponse'
+                  type: array
+              type: object
+        "400":
+          description: Requisição Inválida
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Leitura de Emails
+      tags:
+      - Email
+  /v1/connector/read/full:
+    post:
+      description: Obter os emails para os parametros informados.
+      operationId: GetEmailFilterFull
       parameters:
       - description: Requisição Body
         in: body

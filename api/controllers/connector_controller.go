@@ -35,7 +35,7 @@ func NewConnectorController(env config.Config) *ConnectorController {
 // @In header
 // @Name Authorization
 // @Type apiKey
-// @Success 200 {object} response.HttpResponse{} "Dados recebidos!"
+// @Success 200 {object} response.HttpResponse{data=[]response.EmailResponse{}} "Dados recebidos!"
 // @Failure 400 {object} response.HttpResponse "Requisição Inválida"
 // @Router /v1/connector/read [post]
 func (c *ConnectorController) GetEmailFilter(ctx *gin.Context) {
@@ -51,5 +51,36 @@ func (c *ConnectorController) GetEmailFilter(ctx *gin.Context) {
 		return
 	}
 	resp := c.connectorService.GetEmailFilter(req)
+	ctx.JSON(resp.Code, resp)
+}
+
+// GetEmailFilterFull godoc
+// @Tags Email
+// @Summary Leitura de Emails
+// @Description Obter os emails para os parametros informados.
+// @ID GetEmailFilterFull
+// @Param body body request.GetEmailFilterRequest true "Requisição Body"
+// @Produce json
+// @Security ApiKeyAuth
+// @SecurityDefinitions ApiKeyAuth
+// @In header
+// @Name Authorization
+// @Type apiKey
+// @Success 200 {object} response.HttpResponse{} "Dados recebidos!"
+// @Failure 400 {object} response.HttpResponse "Requisição Inválida"
+// @Router /v1/connector/read/full [post]
+func (c *ConnectorController) GetEmailFilterFull(ctx *gin.Context) {
+	req := request.GetEmailFilterRequest{}
+	err := ctx.ShouldBindJSON(&req)
+	if err != nil {
+		webResponse := response.HttpResponse{
+			Code:    http.StatusBadRequest,
+			Status:  http.StatusText(http.StatusBadRequest),
+			Message: "Parametros invalidos.",
+		}
+		ctx.JSON(webResponse.Code, webResponse)
+		return
+	}
+	resp := c.connectorService.GetEmailFilterFull(req)
 	ctx.JSON(resp.Code, resp)
 }

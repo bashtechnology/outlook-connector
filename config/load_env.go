@@ -49,6 +49,7 @@ func LoadConfig(path string) (Config, error) {
 			TokenSecret:    os.Getenv("TOKEN_SECRET"),
 			TokenApi:       os.Getenv("TOKEN_API"),
 			AllowedOrigins: os.Getenv("ALLOWED_ORIGINS"),
+			MailBox:        os.Getenv("MAIL_BOX"),
 			TokenExpiresIn: duration,
 			TokenMaxAge:    60,
 		}
@@ -63,6 +64,7 @@ func LoadConfig(path string) (Config, error) {
 			TokenSecret:    os.Getenv("TOKEN_SECRET"),
 			TokenApi:       os.Getenv("TOKEN_API"),
 			AllowedOrigins: os.Getenv("ALLOWED_ORIGINS"),
+			MailBox:        os.Getenv("MAIL_BOX"),
 		}
 	case "local":
 		config = Config{
@@ -75,6 +77,7 @@ func LoadConfig(path string) (Config, error) {
 			TokenSecret:    os.Getenv("TOKEN_SECRET"),
 			TokenApi:       os.Getenv("TOKEN_API"),
 			AllowedOrigins: os.Getenv("ALLOWED_ORIGINS"),
+			MailBox:        os.Getenv("MAIL_BOX"),
 		}
 	default:
 		viper.AddConfigPath(path)

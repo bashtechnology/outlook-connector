@@ -46,6 +46,64 @@ const docTemplate = `{
                     "200": {
                         "description": "Dados recebidos!",
                         "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.HttpResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.EmailResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Requisição Inválida",
+                        "schema": {
+                            "$ref": "#/definitions/response.HttpResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/connector/read/full": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Obter os emails para os parametros informados.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Email"
+                ],
+                "summary": "Leitura de Emails",
+                "operationId": "GetEmailFilterFull",
+                "parameters": [
+                    {
+                        "description": "Requisição Body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.GetEmailFilterRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados recebidos!",
+                        "schema": {
                             "$ref": "#/definitions/response.HttpResponse"
                         }
                     },
@@ -164,6 +222,109 @@ const docTemplate = `{
                 }
             }
         },
+        "response.AttachmentResponse": {
+            "type": "object",
+            "properties": {
+                "base64": {
+                    "type": "string"
+                },
+                "content_type": {
+                    "description": "Tipo MIME do anexo (ex: image/png, application/pdf)",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "ID do anexo (caso disponível)",
+                    "type": "string"
+                },
+                "is_inline": {
+                    "description": "Indica se o anexo é inline",
+                    "type": "boolean"
+                },
+                "last_modified_date_time": {
+                    "description": "Data e hora da última modificação do anexo",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Nome do anexo",
+                    "type": "string"
+                },
+                "size": {
+                    "description": "Tamanho do anexo em bytes",
+                    "type": "integer"
+                }
+            }
+        },
+        "response.EmailResponse": {
+            "type": "object",
+            "properties": {
+                "attachments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.AttachmentResponse"
+                    }
+                },
+                "bcc_recipients": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.RecipientResponse"
+                    }
+                },
+                "body_content": {
+                    "type": "string"
+                },
+                "body_content_type": {
+                    "type": "string"
+                },
+                "cc_recipients": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.RecipientResponse"
+                    }
+                },
+                "conversation_id": {
+                    "type": "string"
+                },
+                "from_email": {
+                    "type": "string"
+                },
+                "from_name": {
+                    "type": "string"
+                },
+                "has_attachments": {
+                    "type": "boolean"
+                },
+                "importance": {
+                    "type": "string"
+                },
+                "internet_message_id": {
+                    "type": "string"
+                },
+                "is_read": {
+                    "type": "boolean"
+                },
+                "received_date_time": {
+                    "type": "string"
+                },
+                "sender_email": {
+                    "type": "string"
+                },
+                "sender_name": {
+                    "type": "string"
+                },
+                "sent_date_time": {
+                    "type": "string"
+                },
+                "subject": {
+                    "type": "string"
+                },
+                "to_recipients": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.RecipientResponse"
+                    }
+                }
+            }
+        },
         "response.HttpResponse": {
             "type": "object",
             "properties": {
@@ -175,6 +336,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.RecipientResponse": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 }
             }
