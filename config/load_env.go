@@ -14,11 +14,6 @@ type Config struct {
 	TenantID     string
 	RedirectURL  string
 
-	URIMongo       string
-	UrlWs          string
-	UrlBase        string
-	UrlApiPositus  string
-	UrlApiGupshup  string
 	AllowedOrigins string
 
 	ServerPort string
@@ -29,6 +24,8 @@ type Config struct {
 	TokenMaxAge    int
 	DataInicio     time.Time
 	ProductMode    string
+
+	MailBox string
 }
 
 func LoadConfig(path string) (Config, error) {
@@ -52,11 +49,6 @@ func LoadConfig(path string) (Config, error) {
 			TokenSecret:    os.Getenv("TOKEN_SECRET"),
 			TokenApi:       os.Getenv("TOKEN_API"),
 			AllowedOrigins: os.Getenv("ALLOWED_ORIGINS"),
-			URIMongo:       os.Getenv("URL_MONGO"),
-			UrlWs:          fmt.Sprintf(os.Getenv("URL_BASE") + "wss/"),
-			UrlBase:        os.Getenv("URL_BASE"),
-			UrlApiPositus:  os.Getenv("URL_API_POSITUS"),
-			UrlApiGupshup:  os.Getenv("URL_API_GUPSHUP"),
 			TokenExpiresIn: duration,
 			TokenMaxAge:    60,
 		}
@@ -71,11 +63,6 @@ func LoadConfig(path string) (Config, error) {
 			TokenSecret:    os.Getenv("TOKEN_SECRET"),
 			TokenApi:       os.Getenv("TOKEN_API"),
 			AllowedOrigins: os.Getenv("ALLOWED_ORIGINS"),
-			URIMongo:       os.Getenv("URL_MONGO"),
-			UrlWs:          fmt.Sprintf(os.Getenv("URL_BASE") + "wss/"),
-			UrlBase:        os.Getenv("URL_BASE"),
-			UrlApiPositus:  os.Getenv("URL_API_POSITUS"),
-			UrlApiGupshup:  os.Getenv("URL_API_GUPSHUP"),
 		}
 	case "local":
 		config = Config{
@@ -88,11 +75,6 @@ func LoadConfig(path string) (Config, error) {
 			TokenSecret:    os.Getenv("TOKEN_SECRET"),
 			TokenApi:       os.Getenv("TOKEN_API"),
 			AllowedOrigins: os.Getenv("ALLOWED_ORIGINS"),
-			URIMongo:       os.Getenv("URL_MONGO"),
-			UrlWs:          fmt.Sprintf(os.Getenv("URL_BASE") + "wss/"),
-			UrlBase:        os.Getenv("URL_BASE"),
-			UrlApiPositus:  os.Getenv("URL_API_POSITUS"),
-			UrlApiGupshup:  os.Getenv("URL_API_GUPSHUP"),
 		}
 	default:
 		viper.AddConfigPath(path)
@@ -108,6 +90,5 @@ func LoadConfig(path string) (Config, error) {
 			return config, err
 		}
 	}
-	// config.URIMongo = "mongodb://" + config.DBUsername + ":" + config.DBPassword + "@" + config.DBHost + ":" + config.DBPort
 	return config, nil
 }

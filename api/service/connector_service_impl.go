@@ -3,10 +3,7 @@ package service
 import (
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
-	"io"
-	"log/slog"
 	"net/http"
 	"outlook-connector/api/data/common"
 	"outlook-connector/api/data/request"
@@ -50,22 +47,118 @@ func NewConnectorServiceImpl(env config.Config) (*ConnectorServiceImpl, error) {
 }
 
 func (s *ConnectorServiceImpl) GetEmailFilter(req request.GetEmailFilterRequest) response.HttpResponse {
-	// Ler os e-mails da caixa de entrada
-
-	// filter := "isRead eq false"
-	filter := req.Filter
-	requestParameters := &graphusers.ItemMessagesRequestBuilderGetQueryParameters{
-		Select: []string{"sender", "subject", "isRead", "body", "conversationid"},
-		Filter: &filter,
-	}
-	configuration := &graphusers.ItemMessagesRequestBuilderGetRequestConfiguration{
-		QueryParameters: requestParameters,
-	}
-	emails, err := s.client.Users().ByUserId("webbot@bashtechnology.com.br").Messages().Get(context.Background(), configuration)
+	emails, err := s.LerEmails(req)
 	if err != nil {
-		return nil, fmt.Errorf("Erro ao ler e-mails: %v", err)
+		return response.HttpResponse{
+			Code:    http.StatusInternalServerError,
+			Status:  "Erro",
+			Message: err.Error(),
+		}
 	}
-	return emails.GetValue(), nil
+	// Processar cada e-mail lido
+	// for _, email := range emails {
+	// 	// Inicializa a estrutura do e-mail
+	// 	emailData := common.EmailData{
+	// 		App:       "YourAppName",
+	// 		Timestamp: time.Now().Unix(),
+	// 		Type:      "email",
+	// 		Version:   1,
+	// 		Payload:   common.Payload{},
+	// 	}
+	// 	// Preenchendo o remetente
+	// 	sender := email.GetSender()
+	// 	if sender != nil {
+	// 		emailAddress := sender.GetEmailAddress()
+	// 		if emailAddress != nil {
+	// 			emailData.Payload.Sender = *emailAddress.GetAddress()
+	// 		}
+	// 	}
+	// 	// Obtém os anexos do e-mail
+	// 	messageId := *email.GetId()
+	// 	anexos, err := getAttachments(s.client, messageId, "webbot@bashtechnology.com.br")
+	// 	if err != nil {
+	// 		fmt.Println("\nErro ao obter anexos:", err)
+	// 		return response.HttpResponse{
+	// 			Code:    http.StatusInternalServerError,
+	// 			Status:  "Erro",
+	// 			Message: err.Error(),
+	// 		}
+	// 	}
+	// 	emailData.Payload.Anexos = anexos
+	// 	// Preenchendo o texto do corpo
+	// 	body := email.GetBody()
+	// 	if body != nil {
+	// 		plainText := stripHTMLTags(*body.GetContent())
+	// 		latestReply := extractLatestReply(plainText)
+	// 		emailData.Payload.Text = latestReply
+	// 	}
+	// 	// Preenchendo o assunto do e-mail como "caption"
+	// 	emailData.Payload.Caption = *email.GetSubject()
+	// 	// Converter emailData para JSON
+	// 	jsonData, err := json.Marshal(emailData)
+	// 	if err != nil {
+	// 		fmt.Println("\nErro ao converter para JSON:", err)
+	// 		return response.HttpResponse{
+	// 			Code:    http.StatusInternalServerError,
+	// 			Status:  "Erro",
+	// 			Message: err.Error(),
+	// 		}
+	// 	}
+	// 	// Criando solicitação HTTP
+	// 	req, err := http.NewRequest("POST", "https://webbot.bashtechnology.com.br/reciver/open/webbot/plataformas/9/instance/66fedc0746ea2f1f1e0901f8/fluxo/670dd2411aa1da235c2ebb20", strings.NewReader(string(jsonData)))
+	// 	// req, err := http.NewRequest("POST", "http://localhost:9061/reciver/open/webbot/plataformas/9/instance/66fedc0746ea2f1f1e0901f8/fluxo/670dd2411aa1da235c2ebb20", strings.NewReader(string(jsonData)))
+	// 	if err != nil {
+	// 		fmt.Println("\nErro ao criar solicitação:", err)
+	// 		return response.HttpResponse{
+	// 			Code:    http.StatusInternalServerError,
+	// 			Status:  "Erro",
+	// 			Message: err.Error(),
+	// 		}
+	// 	}
+	// 	req.Header.Set("Content-Type", "application/json")
+	// 	req.Header.Set("Authorization", "Token BTNDoz91G0j@kn3Qo43Wym1t4717io0TOY7Mwi_VKReXVtmYvOiy")
+	// 	origin := "https://webbot.bashtechnology.com.br" // Substitua com a origem desejada
+	// 	req.Header.Set("Origin", origin)
+	// 	client := http.Client{
+	// 		Timeout: 30 * time.Second,
+	// 	}
+	// 	resp, err := client.Do(req)
+	// 	if err != nil {
+	// 		fmt.Println("\nErro ao enviar solicitação:", err)
+	// 		client.Timeout = 60 * time.Second // Aumentando o tempo limite para a segunda tentativa
+	// 		resp, err = client.Do(req)
+	// 		if err != nil {
+	// 			fmt.Println("\nErro ao enviar solicitação na segunda tentativa:", err)
+	// 			return response.HttpResponse{
+	// 				Code:    http.StatusInternalServerError,
+	// 				Status:  "Erro",
+	// 				Message: err.Error(),
+	// 			}
+	// 		}
+	// 	}
+	// 	defer resp.Body.Close()
+
+	// 	// Imprimindo o status e o corpo da resposta
+	// 	fmt.Printf("\nResponse status: %s\n", resp.Status)
+	// 	responseBody, err := io.ReadAll(resp.Body)
+	// 	if err != nil {
+	// 		fmt.Println("\nErro ao ler corpo da resposta:", err)
+	// 	} else {
+	// 		fmt.Printf("Response body: %s\n", string(responseBody))
+	// 	}
+	// 	// Após processar o e-mail, marque como lido
+	// 	err_mark := s.MarkEmailAsRead(*email.GetId())
+	// 	if err_mark != nil {
+	// 		slog.Debug("⚙️ Rotina Email", "Erro ao marcar e-mail como lido", err_mark)
+	// 	}
+	// }
+
+	return response.HttpResponse{
+		Code:    http.StatusOK,
+		Status:  "OK",
+		Message: "E-mails lidos",
+		Data:    emails,
+	}
 }
 
 // Função para remover conteúdo anterior em uma resposta de e-mail
@@ -141,159 +234,29 @@ func (s *ConnectorServiceImpl) MarkEmailAsRead(emailID string) error {
 	return nil
 }
 
-func (s *ConnectorServiceImpl) IniciaRotinaLeituraEmail() {
-	slog.Debug("⚙️ Rotina Email", "Status", "📢 Rotina iniciada.")
-	resultado := s.ExecuteRotinaLeituraEmail("⚙️ Rotina Email")
-
-	if resultado.Code != http.StatusOK {
-		slog.Debug("⚙️ Rotina Email", "💥Erro", resultado.Message, "Func", "ExecuteRotinaLeituraEmail")
-	}
-	slog.Debug("⚙️ Rotina Email", "Status", "✅ Rotina concluída com sucesso.")
-	s.rotina = time.NewTicker(15 * time.Second)
-	defer s.rotina.Stop()
-	for {
-		select {
-		case <-s.rotina.C:
-			slog.Debug("⚙️ Rotina Email", "Status", "📢 Rotina iniciada.")
-			resultado := s.ExecuteRotinaLeituraEmail("⚙️ Rotina Email")
-
-			if resultado.Code != http.StatusOK {
-				slog.Debug("⚙️ Rotina Email", "💥Erro", resultado.Message, "Func", "ExecuteRotinaLeituraEmail")
-			}
-			slog.Debug("⚙️ Rotina Email", "Status", "✅ Rotina concluída com sucesso.")
-		}
-	}
-}
-func (s *ConnectorServiceImpl) ExecuteRotinaLeituraEmail(log string) response.HttpResponse {
-	// Usar mutex para garantir que a rotina não seja executada concorrente
-	s.mutexRotina.Lock()
-	defer s.mutexRotina.Unlock()
-
-	emails, err := s.LerEmails()
-	if err != nil {
-		return response.HttpResponse{
-			Code:    http.StatusInternalServerError,
-			Status:  "Erro",
-			Message: err.Error(),
-		}
-	}
-	// Processar cada e-mail lido
-	for _, email := range emails {
-		// Inicializa a estrutura do e-mail
-		emailData := common.EmailData{
-			App:       "YourAppName",
-			Timestamp: time.Now().Unix(),
-			Type:      "email",
-			Version:   1,
-			Payload:   common.Payload{},
-		}
-		// Preenchendo o remetente
-		sender := email.GetSender()
-		if sender != nil {
-			emailAddress := sender.GetEmailAddress()
-			if emailAddress != nil {
-				emailData.Payload.Sender = *emailAddress.GetAddress()
-			}
-		}
-		// Obtém os anexos do e-mail
-		messageId := *email.GetId()
-		anexos, err := getAttachments(s.client, messageId, "webbot@bashtechnology.com.br")
-		if err != nil {
-			fmt.Println("\nErro ao obter anexos:", err)
-			return response.HttpResponse{
-				Code:    http.StatusInternalServerError,
-				Status:  "Erro",
-				Message: err.Error(),
-			}
-		}
-		emailData.Payload.Anexos = anexos
-		// Preenchendo o texto do corpo
-		body := email.GetBody()
-		if body != nil {
-			plainText := stripHTMLTags(*body.GetContent())
-			latestReply := extractLatestReply(plainText)
-			emailData.Payload.Text = latestReply
-		}
-		// Preenchendo o assunto do e-mail como "caption"
-		emailData.Payload.Caption = *email.GetSubject()
-		// Converter emailData para JSON
-		jsonData, err := json.Marshal(emailData)
-		if err != nil {
-			fmt.Println("\nErro ao converter para JSON:", err)
-			return response.HttpResponse{
-				Code:    http.StatusInternalServerError,
-				Status:  "Erro",
-				Message: err.Error(),
-			}
-		}
-		// Criando solicitação HTTP
-		req, err := http.NewRequest("POST", "https://webbot.bashtechnology.com.br/reciver/open/webbot/plataformas/9/instance/66fedc0746ea2f1f1e0901f8/fluxo/670dd2411aa1da235c2ebb20", strings.NewReader(string(jsonData)))
-		// req, err := http.NewRequest("POST", "http://localhost:9061/reciver/open/webbot/plataformas/9/instance/66fedc0746ea2f1f1e0901f8/fluxo/670dd2411aa1da235c2ebb20", strings.NewReader(string(jsonData)))
-		if err != nil {
-			fmt.Println("\nErro ao criar solicitação:", err)
-			return response.HttpResponse{
-				Code:    http.StatusInternalServerError,
-				Status:  "Erro",
-				Message: err.Error(),
-			}
-		}
-		req.Header.Set("Content-Type", "application/json")
-		req.Header.Set("Authorization", "Token BTNDoz91G0j@kn3Qo43Wym1t4717io0TOY7Mwi_VKReXVtmYvOiy")
-		origin := "https://webbot.bashtechnology.com.br" // Substitua com a origem desejada
-		req.Header.Set("Origin", origin)
-		client := http.Client{
-			Timeout: 30 * time.Second,
-		}
-		resp, err := client.Do(req)
-		if err != nil {
-			fmt.Println("\nErro ao enviar solicitação:", err)
-			client.Timeout = 60 * time.Second // Aumentando o tempo limite para a segunda tentativa
-			resp, err = client.Do(req)
-			if err != nil {
-				fmt.Println("\nErro ao enviar solicitação na segunda tentativa:", err)
-				return response.HttpResponse{
-					Code:    http.StatusInternalServerError,
-					Status:  "Erro",
-					Message: err.Error(),
-				}
-			}
-		}
-		defer resp.Body.Close()
-
-		// Imprimindo o status e o corpo da resposta
-		fmt.Printf("\nResponse status: %s\n", resp.Status)
-		responseBody, err := io.ReadAll(resp.Body)
-		if err != nil {
-			fmt.Println("\nErro ao ler corpo da resposta:", err)
-		} else {
-			fmt.Printf("Response body: %s\n", string(responseBody))
-		}
-		// Após processar o e-mail, marque como lido
-		err_mark := s.MarkEmailAsRead(*email.GetId())
-		if err_mark != nil {
-			slog.Debug("⚙️ Rotina Email", "Erro ao marcar e-mail como lido", err_mark)
-		}
-	}
-
-	return response.HttpResponse{
-		Code:    http.StatusOK,
-		Status:  "OK",
-		Message: "E-mails lidos e processados",
-	}
-}
-
 // Função para ler e-mails usando a Microsoft Graph API
-func (s *ConnectorServiceImpl) LerEmails() ([]models.Messageable, error) {
+func (s *ConnectorServiceImpl) LerEmails(req request.GetEmailFilterRequest) ([]models.Messageable, error) {
 	// Ler os e-mails da caixa de entrada
-	filter := "isRead eq false"
+	// filter := "isRead eq false"
+	// requestParameters := &graphusers.ItemMessagesRequestBuilderGetQueryParameters{
+	// 	Select: []string{"sender", "subject", "isRead", "body", "conversationid"},
+	// 	Filter: &filter,
+	// }
+
 	requestParameters := &graphusers.ItemMessagesRequestBuilderGetQueryParameters{
-		Select: []string{"sender", "subject", "isRead", "body", "conversationid"},
-		Filter: &filter,
+		Select:  req.Select,
+		Filter:  req.Filter,
+		Search:  req.Search,
+		Expand:  req.Expand,
+		Orderby: req.Orderby,
+		Top:     req.Top,
+		Skip:    req.Skip,
 	}
+
 	configuration := &graphusers.ItemMessagesRequestBuilderGetRequestConfiguration{
 		QueryParameters: requestParameters,
 	}
-	emails, err := s.client.Users().ByUserId("webbot@bashtechnology.com.br").Messages().Get(context.Background(), configuration)
+	emails, err := s.client.Users().ByUserId(s.env.MailBox).Messages().Get(context.Background(), configuration)
 	if err != nil {
 		return nil, fmt.Errorf("Erro ao ler e-mails: %v", err)
 	}
