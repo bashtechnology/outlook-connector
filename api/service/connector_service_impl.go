@@ -55,104 +55,6 @@ func (s *ConnectorServiceImpl) GetEmailFilter(req request.GetEmailFilterRequest)
 			Message: err.Error(),
 		}
 	}
-	// Processar cada e-mail lido
-	// for _, email := range emails {
-	// 	// Inicializa a estrutura do e-mail
-	// 	emailData := common.EmailData{
-	// 		App:       "YourAppName",
-	// 		Timestamp: time.Now().Unix(),
-	// 		Type:      "email",
-	// 		Version:   1,
-	// 		Payload:   common.Payload{},
-	// 	}
-	// 	// Preenchendo o remetente
-	// 	sender := email.GetSender()
-	// 	if sender != nil {
-	// 		emailAddress := sender.GetEmailAddress()
-	// 		if emailAddress != nil {
-	// 			emailData.Payload.Sender = *emailAddress.GetAddress()
-	// 		}
-	// 	}
-	// 	// Obtém os anexos do e-mail
-	// 	messageId := *email.GetId()
-	// 	anexos, err := getAttachments(s.client, messageId, "webbot@bashtechnology.com.br")
-	// 	if err != nil {
-	// 		fmt.Println("\nErro ao obter anexos:", err)
-	// 		return response.HttpResponse{
-	// 			Code:    http.StatusInternalServerError,
-	// 			Status:  "Erro",
-	// 			Message: err.Error(),
-	// 		}
-	// 	}
-	// 	emailData.Payload.Anexos = anexos
-	// 	// Preenchendo o texto do corpo
-	// 	body := email.GetBody()
-	// 	if body != nil {
-	// 		plainText := stripHTMLTags(*body.GetContent())
-	// 		latestReply := extractLatestReply(plainText)
-	// 		emailData.Payload.Text = latestReply
-	// 	}
-	// 	// Preenchendo o assunto do e-mail como "caption"
-	// 	emailData.Payload.Caption = *email.GetSubject()
-	// 	// Converter emailData para JSON
-	// 	jsonData, err := json.Marshal(emailData)
-	// 	if err != nil {
-	// 		fmt.Println("\nErro ao converter para JSON:", err)
-	// 		return response.HttpResponse{
-	// 			Code:    http.StatusInternalServerError,
-	// 			Status:  "Erro",
-	// 			Message: err.Error(),
-	// 		}
-	// 	}
-	// 	// Criando solicitação HTTP
-	// 	req, err := http.NewRequest("POST", "https://webbot.bashtechnology.com.br/reciver/open/webbot/plataformas/9/instance/66fedc0746ea2f1f1e0901f8/fluxo/670dd2411aa1da235c2ebb20", strings.NewReader(string(jsonData)))
-	// 	// req, err := http.NewRequest("POST", "http://localhost:9061/reciver/open/webbot/plataformas/9/instance/66fedc0746ea2f1f1e0901f8/fluxo/670dd2411aa1da235c2ebb20", strings.NewReader(string(jsonData)))
-	// 	if err != nil {
-	// 		fmt.Println("\nErro ao criar solicitação:", err)
-	// 		return response.HttpResponse{
-	// 			Code:    http.StatusInternalServerError,
-	// 			Status:  "Erro",
-	// 			Message: err.Error(),
-	// 		}
-	// 	}
-	// 	req.Header.Set("Content-Type", "application/json")
-	// 	req.Header.Set("Authorization", "Token BTNDoz91G0j@kn3Qo43Wym1t4717io0TOY7Mwi_VKReXVtmYvOiy")
-	// 	origin := "https://webbot.bashtechnology.com.br" // Substitua com a origem desejada
-	// 	req.Header.Set("Origin", origin)
-	// 	client := http.Client{
-	// 		Timeout: 30 * time.Second,
-	// 	}
-	// 	resp, err := client.Do(req)
-	// 	if err != nil {
-	// 		fmt.Println("\nErro ao enviar solicitação:", err)
-	// 		client.Timeout = 60 * time.Second // Aumentando o tempo limite para a segunda tentativa
-	// 		resp, err = client.Do(req)
-	// 		if err != nil {
-	// 			fmt.Println("\nErro ao enviar solicitação na segunda tentativa:", err)
-	// 			return response.HttpResponse{
-	// 				Code:    http.StatusInternalServerError,
-	// 				Status:  "Erro",
-	// 				Message: err.Error(),
-	// 			}
-	// 		}
-	// 	}
-	// 	defer resp.Body.Close()
-
-	// 	// Imprimindo o status e o corpo da resposta
-	// 	fmt.Printf("\nResponse status: %s\n", resp.Status)
-	// 	responseBody, err := io.ReadAll(resp.Body)
-	// 	if err != nil {
-	// 		fmt.Println("\nErro ao ler corpo da resposta:", err)
-	// 	} else {
-	// 		fmt.Printf("Response body: %s\n", string(responseBody))
-	// 	}
-	// 	// Após processar o e-mail, marque como lido
-	// 	err_mark := s.MarkEmailAsRead(*email.GetId())
-	// 	if err_mark != nil {
-	// 		slog.Debug("⚙️ Rotina Email", "Erro ao marcar e-mail como lido", err_mark)
-	// 	}
-	// }
-
 	return response.HttpResponse{
 		Code:    http.StatusOK,
 		Status:  "OK",
@@ -242,10 +144,9 @@ func (s *ConnectorServiceImpl) LerEmails(req request.GetEmailFilterRequest) ([]m
 	// 	Select: []string{"sender", "subject", "isRead", "body", "conversationid"},
 	// 	Filter: &filter,
 	// }
-
 	requestParameters := &graphusers.ItemMessagesRequestBuilderGetQueryParameters{
-		Select:  req.Select,
-		Filter:  req.Filter,
+		Select:  req.Select, //[]string{"sender", "subject", "isRead", "body", "conversationid"}
+		Filter:  req.Filter, //"isRead eq false"
 		Search:  req.Search,
 		Expand:  req.Expand,
 		Orderby: req.Orderby,

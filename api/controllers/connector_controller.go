@@ -28,13 +28,14 @@ func NewConnectorController(env config.Config) *ConnectorController {
 // @Summary Leitura de Emails
 // @Description Obter os emails para os parametros informados.
 // @ID GetEmailFilter
+// @Param body body request.GetEmailFilterRequest true "Requisição Body"
 // @Produce json
 // @Security ApiKeyAuth
 // @SecurityDefinitions ApiKeyAuth
 // @In header
 // @Name Authorization
 // @Type apiKey
-// @Success 200 {object} response.HttpResponse{data=response.MonitoramentoResponse} "Dados recebidos!"
+// @Success 200 {object} response.HttpResponse{} "Dados recebidos!"
 // @Failure 400 {object} response.HttpResponse "Requisição Inválida"
 // @Router /v1/connector/read [post]
 func (c *ConnectorController) GetEmailFilter(ctx *gin.Context) {

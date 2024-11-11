@@ -15,50 +15,81 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/token/v1/webbot/monitoramento/{empresas_id}": {
-            "get": {
+        "/v1/connector/read": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Obter os dados em fila para uma empresa.",
+                "description": "Obter os emails para os parametros informados.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Monitoramento"
+                    "Email"
                 ],
-                "summary": "Dados Filas",
-                "operationId": "monitoramentoFilters",
+                "summary": "Leitura de Emails",
+                "operationId": "GetEmailFilter",
                 "parameters": [
                     {
-                        "type": "string",
-                        "format": "string",
-                        "default": "empresas_id",
-                        "description": "ID da Empresa",
-                        "name": "empresas_id",
-                        "in": "path",
-                        "required": true
+                        "description": "Requisição Body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.GetEmailFilterRequest"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "Dados recebidos!",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.HttpResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/response.MonitoramentoResponse"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/response.HttpResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Requisição Inválida",
+                        "schema": {
+                            "$ref": "#/definitions/response.HttpResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/open/token": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Obter os dados de token JWT para acesso.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get Token",
+                "operationId": "GetToken",
+                "parameters": [
+                    {
+                        "description": "Requisição Body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.GetTokenRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados recebidos!",
+                        "schema": {
+                            "$ref": "#/definitions/response.HttpResponse"
                         }
                     },
                     "400": {
@@ -72,6 +103,67 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "request.GetEmailFilterRequest": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "description": "Flag para retornar a contagem total",
+                    "type": "boolean"
+                },
+                "expand": {
+                    "description": "Propriedades adicionais para expandir",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "filter": {
+                    "description": "Condição de filtro",
+                    "type": "string"
+                },
+                "includeHiddenMessages": {
+                    "description": "Flag para incluir mensagens ocultas",
+                    "type": "boolean"
+                },
+                "orderby": {
+                    "description": "Ordenação dos resultados",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "search": {
+                    "description": "Termo de pesquisa",
+                    "type": "string"
+                },
+                "select": {
+                    "description": "Seleção de campos específicos",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "skip": {
+                    "description": "Número de registros para ignorar",
+                    "type": "integer"
+                },
+                "top": {
+                    "description": "Número máximo de registros a retornar",
+                    "type": "integer"
+                }
+            }
+        },
+        "request.GetTokenRequest": {
+            "type": "object",
+            "required": [
+                "key"
+            ],
+            "properties": {
+                "key": {
+                    "type": "string"
+                }
+            }
+        },
         "response.HttpResponse": {
             "type": "object",
             "properties": {
@@ -83,241 +175,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "type": "string"
-                }
-            }
-        },
-        "response.MonitoramentoAvisos": {
-            "type": "object",
-            "properties": {
-                "descritivo": {
-                    "type": "string"
-                },
-                "elementos": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/response.MonitoramentoListaObjects"
-                    }
-                },
-                "tipo": {
-                    "description": "ou usuario ou fila",
-                    "type": "string"
-                }
-            }
-        },
-        "response.MonitoramentoDadosCliente": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "nome": {
-                    "type": "string"
-                }
-            }
-        },
-        "response.MonitoramentoDadosEmpresa": {
-            "type": "object",
-            "properties": {
-                "avisos": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/response.MonitoramentoAvisos"
-                    }
-                },
-                "filas": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/response.MonitoramentoListaFilas"
-                    }
-                },
-                "id": {
-                    "type": "string"
-                },
-                "id_empresa": {
-                    "type": "integer"
-                },
-                "nome": {
-                    "type": "string"
-                },
-                "timers": {
-                    "$ref": "#/definitions/response.MonitoramentoTimers"
-                },
-                "usuarios": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/response.MonitoramentoUsuario"
-                    }
-                }
-            }
-        },
-        "response.MonitoramentoFilasItemAtendimento": {
-            "type": "object",
-            "properties": {
-                "cliente": {
-                    "$ref": "#/definitions/response.MonitoramentoDadosCliente"
-                },
-                "conversas_id": {
-                    "type": "string"
-                },
-                "created": {
-                    "type": "integer"
-                },
-                "data_inicio_atendimento": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "plataformas": {
-                    "$ref": "#/definitions/response.MonitoramentoPlataforma"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "usuarios_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "response.MonitoramentoFilasItemNovo": {
-            "type": "object",
-            "properties": {
-                "cliente": {
-                    "$ref": "#/definitions/response.MonitoramentoDadosCliente"
-                },
-                "conversas_id": {
-                    "type": "string"
-                },
-                "created": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "plataformas": {
-                    "$ref": "#/definitions/response.MonitoramentoPlataforma"
-                },
-                "status": {
-                    "type": "string"
-                }
-            }
-        },
-        "response.MonitoramentoListaFilas": {
-            "type": "object",
-            "properties": {
-                "atendimento": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/response.MonitoramentoFilasItemAtendimento"
-                    }
-                },
-                "fila": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/response.MonitoramentoFilasItemNovo"
-                    }
-                },
-                "id": {
-                    "type": "string"
-                },
-                "nome": {
-                    "type": "string"
-                },
-                "timers": {
-                    "$ref": "#/definitions/response.MonitoramentoTimers"
-                },
-                "usuarios": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/response.MonitoramentoUsuarioItem"
-                    }
-                }
-            }
-        },
-        "response.MonitoramentoListaObjects": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                }
-            }
-        },
-        "response.MonitoramentoPlataforma": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "nome": {
-                    "type": "string"
-                }
-            }
-        },
-        "response.MonitoramentoResponse": {
-            "type": "object",
-            "properties": {
-                "empresa": {
-                    "$ref": "#/definitions/response.MonitoramentoDadosEmpresa"
-                }
-            }
-        },
-        "response.MonitoramentoTimers": {
-            "type": "object",
-            "properties": {
-                "tma": {
-                    "type": "integer"
-                },
-                "tme": {
-                    "type": "integer"
-                },
-                "tmr": {
-                    "type": "integer"
-                },
-                "tmr1": {
-                    "type": "integer"
-                },
-                "total_conversas": {
-                    "type": "integer"
-                }
-            }
-        },
-        "response.MonitoramentoUsuario": {
-            "type": "object",
-            "properties": {
-                "conversas_andamento": {
-                    "type": "integer"
-                },
-                "conversas_finalizadas": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "last_update": {
-                    "type": "integer"
-                },
-                "nome": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "tma": {
-                    "type": "integer"
-                },
-                "tmr": {
-                    "type": "integer"
-                },
-                "tmr1": {
-                    "type": "integer"
-                }
-            }
-        },
-        "response.MonitoramentoUsuarioItem": {
-            "type": "object",
-            "properties": {
-                "id": {
                     "type": "string"
                 }
             }
@@ -338,8 +195,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "",
 	BasePath:         "/api",
 	Schemes:          []string{},
-	Title:            "outlook-coletor",
-	Description:      "Api integração coletor de emails outlook",
+	Title:            "outlook-connector",
+	Description:      "Api integração connector de emails outlook",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

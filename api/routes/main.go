@@ -31,7 +31,7 @@ func getRoutes(env config.Config) {
 	v1 := api.Group("/v1")
 	open := v1.Group("/open")
 	connector := v1.Group("/connector")
-	connector.Use(middleware.HeaderAuthBearer(env.TokenSecret))
+	// connector.Use(middleware.HeaderAuthBearer(env.TokenSecret))
 	RoutesConnector(connector, env)
 	RoutesOpen(open, env)
 }

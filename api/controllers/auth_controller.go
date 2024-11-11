@@ -28,13 +28,14 @@ func NewAuthController(env config.Config) *AuthController {
 // @Summary Get Token
 // @Description Obter os dados de token JWT para acesso.
 // @ID GetToken
+// @Param body body request.GetTokenRequest true "Requisição Body"
 // @Produce json
 // @Security ApiKeyAuth
 // @SecurityDefinitions ApiKeyAuth
 // @In header
 // @Name Authorization
 // @Type apiKey
-// @Success 200 {object} response.HttpResponse{data=response.MonitoramentoResponse} "Dados recebidos!"
+// @Success 200 {object} response.HttpResponse{} "Dados recebidos!"
 // @Failure 400 {object} response.HttpResponse "Requisição Inválida"
 // @Router /v1/open/token [post]
 func (c *AuthController) GetToken(ctx *gin.Context) {
