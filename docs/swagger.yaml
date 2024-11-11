@@ -1,0 +1,210 @@
+basePath: /api
+definitions:
+  response.HttpResponse:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.MonitoramentoAvisos:
+    properties:
+      descritivo:
+        type: string
+      elementos:
+        items:
+          $ref: '#/definitions/response.MonitoramentoListaObjects'
+        type: array
+      tipo:
+        description: ou usuario ou fila
+        type: string
+    type: object
+  response.MonitoramentoDadosCliente:
+    properties:
+      id:
+        type: string
+      nome:
+        type: string
+    type: object
+  response.MonitoramentoDadosEmpresa:
+    properties:
+      avisos:
+        items:
+          $ref: '#/definitions/response.MonitoramentoAvisos'
+        type: array
+      filas:
+        items:
+          $ref: '#/definitions/response.MonitoramentoListaFilas'
+        type: array
+      id:
+        type: string
+      id_empresa:
+        type: integer
+      nome:
+        type: string
+      timers:
+        $ref: '#/definitions/response.MonitoramentoTimers'
+      usuarios:
+        items:
+          $ref: '#/definitions/response.MonitoramentoUsuario'
+        type: array
+    type: object
+  response.MonitoramentoFilasItemAtendimento:
+    properties:
+      cliente:
+        $ref: '#/definitions/response.MonitoramentoDadosCliente'
+      conversas_id:
+        type: string
+      created:
+        type: integer
+      data_inicio_atendimento:
+        type: integer
+      id:
+        type: string
+      plataformas:
+        $ref: '#/definitions/response.MonitoramentoPlataforma'
+      status:
+        type: string
+      usuarios_id:
+        type: string
+    type: object
+  response.MonitoramentoFilasItemNovo:
+    properties:
+      cliente:
+        $ref: '#/definitions/response.MonitoramentoDadosCliente'
+      conversas_id:
+        type: string
+      created:
+        type: integer
+      id:
+        type: string
+      plataformas:
+        $ref: '#/definitions/response.MonitoramentoPlataforma'
+      status:
+        type: string
+    type: object
+  response.MonitoramentoListaFilas:
+    properties:
+      atendimento:
+        items:
+          $ref: '#/definitions/response.MonitoramentoFilasItemAtendimento'
+        type: array
+      fila:
+        items:
+          $ref: '#/definitions/response.MonitoramentoFilasItemNovo'
+        type: array
+      id:
+        type: string
+      nome:
+        type: string
+      timers:
+        $ref: '#/definitions/response.MonitoramentoTimers'
+      usuarios:
+        items:
+          $ref: '#/definitions/response.MonitoramentoUsuarioItem'
+        type: array
+    type: object
+  response.MonitoramentoListaObjects:
+    properties:
+      id:
+        type: string
+    type: object
+  response.MonitoramentoPlataforma:
+    properties:
+      id:
+        type: integer
+      nome:
+        type: string
+    type: object
+  response.MonitoramentoResponse:
+    properties:
+      empresa:
+        $ref: '#/definitions/response.MonitoramentoDadosEmpresa'
+    type: object
+  response.MonitoramentoTimers:
+    properties:
+      tma:
+        type: integer
+      tme:
+        type: integer
+      tmr:
+        type: integer
+      tmr1:
+        type: integer
+      total_conversas:
+        type: integer
+    type: object
+  response.MonitoramentoUsuario:
+    properties:
+      conversas_andamento:
+        type: integer
+      conversas_finalizadas:
+        type: integer
+      id:
+        type: string
+      last_update:
+        type: integer
+      nome:
+        type: string
+      status:
+        type: string
+      tma:
+        type: integer
+      tmr:
+        type: integer
+      tmr1:
+        type: integer
+    type: object
+  response.MonitoramentoUsuarioItem:
+    properties:
+      id:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: Api integração coletor de emails outlook
+  title: outlook-coletor
+  version: "1.0"
+paths:
+  /token/v1/webbot/monitoramento/{empresas_id}:
+    get:
+      description: Obter os dados em fila para uma empresa.
+      operationId: monitoramentoFilters
+      parameters:
+      - default: empresas_id
+        description: ID da Empresa
+        format: string
+        in: path
+        name: empresas_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Dados recebidos!
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.HttpResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.MonitoramentoResponse'
+              type: object
+        "400":
+          description: Requisição Inválida
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Dados Filas
+      tags:
+      - Monitoramento
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
