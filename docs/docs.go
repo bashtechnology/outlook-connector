@@ -15,6 +15,180 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/v1/connector/folders": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Obter os emails para os parametros informados.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Email"
+                ],
+                "summary": "Leitura de Emails",
+                "operationId": "GetFolders",
+                "parameters": [
+                    {
+                        "description": "Requisição Body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.GetFoldersRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados recebidos!",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.HttpResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.MarkEmailResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Requisição Inválida",
+                        "schema": {
+                            "$ref": "#/definitions/response.HttpResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/connector/mark": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Obter os emails para os parametros informados.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Email"
+                ],
+                "summary": "Leitura de Emails",
+                "operationId": "MarkEmailID",
+                "parameters": [
+                    {
+                        "description": "Requisição Body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.MarkEmailIDRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados recebidos!",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.HttpResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.MarkEmailResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Requisição Inválida",
+                        "schema": {
+                            "$ref": "#/definitions/response.HttpResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/connector/move": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Obter os emails para os parametros informados.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Email"
+                ],
+                "summary": "Leitura de Emails",
+                "operationId": "MoveTo",
+                "parameters": [
+                    {
+                        "description": "Requisição Body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.MoveToRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados recebidos!",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.HttpResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.MarkEmailResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Requisição Inválida",
+                        "schema": {
+                            "$ref": "#/definitions/response.HttpResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/connector/read": {
             "post": {
                 "security": [
@@ -30,7 +204,7 @@ const docTemplate = `{
                     "Email"
                 ],
                 "summary": "Leitura de Emails",
-                "operationId": "GetEmailFilter",
+                "operationId": "GetEmailFilterFolder",
                 "parameters": [
                     {
                         "description": "Requisição Body",
@@ -88,7 +262,7 @@ const docTemplate = `{
                     "Email"
                 ],
                 "summary": "Leitura de Emails",
-                "operationId": "GetEmailFilterFull",
+                "operationId": "GetEmailFilterFullFolder",
                 "parameters": [
                     {
                         "description": "Requisição Body",
@@ -179,7 +353,10 @@ const docTemplate = `{
                     "description": "Condição de filtro",
                     "type": "string"
                 },
-                "includeHiddenMessages": {
+                "folder_id": {
+                    "type": "string"
+                },
+                "include_hidden_messages": {
                     "description": "Flag para incluir mensagens ocultas",
                     "type": "boolean"
                 },
@@ -211,6 +388,14 @@ const docTemplate = `{
                 }
             }
         },
+        "request.GetFoldersRequest": {
+            "type": "object",
+            "properties": {
+                "folder": {
+                    "type": "string"
+                }
+            }
+        },
         "request.GetTokenRequest": {
             "type": "object",
             "required": [
@@ -219,6 +404,31 @@ const docTemplate = `{
             "properties": {
                 "key": {
                     "type": "string"
+                }
+            }
+        },
+        "request.MarkEmailIDRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "request.MoveToRequest": {
+            "type": "object",
+            "properties": {
+                "folder": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },
@@ -293,6 +503,9 @@ const docTemplate = `{
                 "has_attachments": {
                     "type": "boolean"
                 },
+                "id": {
+                    "type": "string"
+                },
                 "importance": {
                     "type": "string"
                 },
@@ -336,6 +549,15 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.MarkEmailResponse": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "id": {
                     "type": "string"
                 }
             }

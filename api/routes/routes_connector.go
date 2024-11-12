@@ -12,4 +12,8 @@ func RoutesConnector(rg *gin.RouterGroup, env config.Config) {
 
 	rg.POST("/read", connectorController.GetEmailFilter)
 	rg.POST("/read/full", connectorController.GetEmailFilterFull)
+	rg.POST("/mark", connectorController.MarkEmailID)
+	rg.POST("/move", connectorController.MoveTo)
+	rg.POST("/folders", connectorController.GetFolders)
+
 }

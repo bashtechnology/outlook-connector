@@ -13,7 +13,9 @@ definitions:
       filter:
         description: Condição de filtro
         type: string
-      includeHiddenMessages:
+      folder_id:
+        type: string
+      include_hidden_messages:
         description: Flag para incluir mensagens ocultas
         type: boolean
       orderby:
@@ -36,12 +38,33 @@ definitions:
         description: Número máximo de registros a retornar
         type: integer
     type: object
+  request.GetFoldersRequest:
+    properties:
+      folder:
+        type: string
+    type: object
   request.GetTokenRequest:
     properties:
       key:
         type: string
     required:
     - key
+    type: object
+  request.MarkEmailIDRequest:
+    properties:
+      id:
+        items:
+          type: string
+        type: array
+    type: object
+  request.MoveToRequest:
+    properties:
+      folder:
+        type: string
+      id:
+        items:
+          type: string
+        type: array
     type: object
   response.AttachmentResponse:
     properties:
@@ -92,6 +115,8 @@ definitions:
         type: string
       has_attachments:
         type: boolean
+      id:
+        type: string
       importance:
         type: string
       internet_message_id:
@@ -123,6 +148,12 @@ definitions:
       status:
         type: string
     type: object
+  response.MarkEmailResponse:
+    properties:
+      error: {}
+      id:
+        type: string
+    type: object
   response.RecipientResponse:
     properties:
       address:
@@ -136,10 +167,112 @@ info:
   title: outlook-connector
   version: "1.0"
 paths:
+  /v1/connector/folders:
+    post:
+      description: Obter os emails para os parametros informados.
+      operationId: GetFolders
+      parameters:
+      - description: Requisição Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.GetFoldersRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Dados recebidos!
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.HttpResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.MarkEmailResponse'
+                  type: array
+              type: object
+        "400":
+          description: Requisição Inválida
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Leitura de Emails
+      tags:
+      - Email
+  /v1/connector/mark:
+    post:
+      description: Obter os emails para os parametros informados.
+      operationId: MarkEmailID
+      parameters:
+      - description: Requisição Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.MarkEmailIDRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Dados recebidos!
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.HttpResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.MarkEmailResponse'
+                  type: array
+              type: object
+        "400":
+          description: Requisição Inválida
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Leitura de Emails
+      tags:
+      - Email
+  /v1/connector/move:
+    post:
+      description: Obter os emails para os parametros informados.
+      operationId: MoveTo
+      parameters:
+      - description: Requisição Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.MoveToRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Dados recebidos!
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.HttpResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.MarkEmailResponse'
+                  type: array
+              type: object
+        "400":
+          description: Requisição Inválida
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Leitura de Emails
+      tags:
+      - Email
   /v1/connector/read:
     post:
       description: Obter os emails para os parametros informados.
-      operationId: GetEmailFilter
+      operationId: GetEmailFilterFolder
       parameters:
       - description: Requisição Body
         in: body
@@ -173,7 +306,7 @@ paths:
   /v1/connector/read/full:
     post:
       description: Obter os emails para os parametros informados.
-      operationId: GetEmailFilterFull
+      operationId: GetEmailFilterFullFolder
       parameters:
       - description: Requisição Body
         in: body

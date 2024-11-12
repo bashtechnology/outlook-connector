@@ -38,3 +38,15 @@ type AttachmentResponse struct {
 	LastModifiedDateTime *time.Time `json:"last_modified_date_time,omitempty"` // Data e hora da última modificação do anexo
 	Id                   *string    `json:"id,omitempty"`                      // ID do anexo (caso disponível)
 }
+type MarkEmailResponse struct {
+	ID    *string `json:"id,omitempty"`
+	Error *error  `json:"error,omitempty"`
+}
+type FolderResponse struct {
+	ID               *string `json:"id,omitempty"`
+	DisplayName      *string `json:"display_name,omitempty"`
+	ParentFolderID   *string `json:"parent_folder_id,omitempty"`
+	ChildFolderCount *int32  `json:"child_folder_count,omitempty"`
+	TotalItemCount   *int32  `json:"total_item_count,omitempty"`
+	UnreadItemCount  *int32  `json:"unread_item_count,omitempty"`
+}
