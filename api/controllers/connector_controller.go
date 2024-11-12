@@ -68,7 +68,7 @@ func (c *ConnectorController) GetEmailFilter(ctx *gin.Context) {
 // @Type apiKey
 // @Success 200 {object} response.HttpResponse{data=[]response.EmailResponse{}} "Dados recebidos!"
 // @Failure 400 {object} response.HttpResponse "Requisição Inválida"
-// @Router /v1/connector/read [post]
+// @Router /v1/connector/folder/read [post]
 func (c *ConnectorController) GetEmailFilterFolder(ctx *gin.Context) {
 	req := request.GetEmailFilterRequest{}
 	err := ctx.ShouldBindJSON(&req)
@@ -130,7 +130,7 @@ func (c *ConnectorController) GetEmailFilterFull(ctx *gin.Context) {
 // @Type apiKey
 // @Success 200 {object} response.HttpResponse{} "Dados recebidos!"
 // @Failure 400 {object} response.HttpResponse "Requisição Inválida"
-// @Router /v1/connector/read/full [post]
+// @Router /v1/connector/folder/read/full [post]
 func (c *ConnectorController) GetEmailFilterFullFolder(ctx *gin.Context) {
 	req := request.GetEmailFilterRequest{}
 	err := ctx.ShouldBindJSON(&req)

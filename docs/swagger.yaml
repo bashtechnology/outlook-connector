@@ -167,6 +167,67 @@ info:
   title: outlook-connector
   version: "1.0"
 paths:
+  /v1/connector/folder/read:
+    post:
+      description: Obter os emails para os parametros informados.
+      operationId: GetEmailFilterFolder
+      parameters:
+      - description: Requisição Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.GetEmailFilterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Dados recebidos!
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.HttpResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.EmailResponse'
+                  type: array
+              type: object
+        "400":
+          description: Requisição Inválida
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Leitura de Emails
+      tags:
+      - Email
+  /v1/connector/folder/read/full:
+    post:
+      description: Obter os emails para os parametros informados.
+      operationId: GetEmailFilterFullFolder
+      parameters:
+      - description: Requisição Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.GetEmailFilterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Dados recebidos!
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+        "400":
+          description: Requisição Inválida
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Leitura de Emails
+      tags:
+      - Email
   /v1/connector/folders:
     post:
       description: Obter os emails para os parametros informados.
@@ -272,7 +333,7 @@ paths:
   /v1/connector/read:
     post:
       description: Obter os emails para os parametros informados.
-      operationId: GetEmailFilterFolder
+      operationId: GetEmailFilter
       parameters:
       - description: Requisição Body
         in: body
@@ -306,7 +367,7 @@ paths:
   /v1/connector/read/full:
     post:
       description: Obter os emails para os parametros informados.
-      operationId: GetEmailFilterFullFolder
+      operationId: GetEmailFilterFull
       parameters:
       - description: Requisição Body
         in: body

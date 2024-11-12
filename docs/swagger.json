@@ -8,6 +8,107 @@
     },
     "basePath": "/api",
     "paths": {
+        "/v1/connector/folder/read": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Obter os emails para os parametros informados.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Email"
+                ],
+                "summary": "Leitura de Emails",
+                "operationId": "GetEmailFilterFolder",
+                "parameters": [
+                    {
+                        "description": "Requisição Body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.GetEmailFilterRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados recebidos!",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.HttpResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.EmailResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Requisição Inválida",
+                        "schema": {
+                            "$ref": "#/definitions/response.HttpResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/connector/folder/read/full": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Obter os emails para os parametros informados.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Email"
+                ],
+                "summary": "Leitura de Emails",
+                "operationId": "GetEmailFilterFullFolder",
+                "parameters": [
+                    {
+                        "description": "Requisição Body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.GetEmailFilterRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados recebidos!",
+                        "schema": {
+                            "$ref": "#/definitions/response.HttpResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Requisição Inválida",
+                        "schema": {
+                            "$ref": "#/definitions/response.HttpResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/connector/folders": {
             "post": {
                 "security": [
@@ -197,7 +298,7 @@
                     "Email"
                 ],
                 "summary": "Leitura de Emails",
-                "operationId": "GetEmailFilterFolder",
+                "operationId": "GetEmailFilter",
                 "parameters": [
                     {
                         "description": "Requisição Body",
@@ -255,7 +356,7 @@
                     "Email"
                 ],
                 "summary": "Leitura de Emails",
-                "operationId": "GetEmailFilterFullFolder",
+                "operationId": "GetEmailFilterFull",
                 "parameters": [
                     {
                         "description": "Requisição Body",
